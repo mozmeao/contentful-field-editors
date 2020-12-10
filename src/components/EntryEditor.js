@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from 'react';
 import {
   TextInput,
   Textarea,
@@ -12,86 +12,79 @@ import {
 import "@contentful/forma-36-react-components/dist/styles.css";
 import "@contentful/forma-36-fcss";
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
+function EntryEditor({sdk: {entry: {fields}}}) {
+  const [title] = useState(fields.title.getValue());
+  const [body] = useState(fields.body.getValue());
+  const [abstract] = useState(fields.abstract.getValue());
+  const [hasAbstract, setHasAbstract] = useState(fields.hasAbstract.getValue());
 
-    this.state = {
-      title: props.sdk.entry.fields.title.getValue(),
-      body: props.sdk.entry.fields.body.getValue(),
-      abstract: props.sdk.entry.fields.abstract.getValue(),
-      hasAbstract: props.sdk.entry.fields.hasAbstract.getValue(),
-    };
-  }
-
-  onTitleChangeHandler = (event: React.ChangeEvent) => {
-    this.props.sdk.entry.fields.title.setValue(event.target.value);
+  const onTitleChangeHandler = (event: React.ChangeEvent) => {
+    fields.title.setValue(event.target.value);
   };
 
-  onBodyChangeHandler = (event: React.ChangeEvent) => {
-    this.props.sdk.entry.fields.body.setValue(event.target.value);
+  const onBodyChangeHandler = (event: React.ChangeEvent) => {
+    fields.body.setValue(event.target.value);
   };
 
-  onAbstractChangeHandler = (event: React.ChangeEvent) => {
-    this.props.sdk.entry.fields.abstract.setValue(event.target.value);
+  const onAbstractChangeHandler = (event: React.ChangeEvent) => {
+    fields.abstract.setValue(event.target.value);
   };
 
-  onHasAbstractChangeHandler = (event: React.ChangeEvent) => {
+  const onHasAbstractChangeHandler = (event: React.ChangeEvent) => {
     const hasAbstract = event.target.value === "yes";
-    this.setState({ hasAbstract });
-    this.props.sdk.entry.fields.hasAbstract.setValue(hasAbstract);
+    setHasAbstract(hasAbstract);
+    fields.hasAbstract.setValue(hasAbstract);
   };
 
-  render() {
-    return (
-      <div className="f36-margin--l">
-        <Typography>
-          <DisplayText>Entry extension demo</DisplayText>
-          <Paragraph>
-            This demo uses a single UI Extension to render all UI for an entry.
+
+  return (
+    <div className="f36-margin--l">
+      <Typography>
+        <DisplayText>Entry extension demo</DisplayText>
+        <Paragraph>
+          This demo uses a single UI Extension to render all UI for an entry.
           </Paragraph>
-          <SectionHeading>Title</SectionHeading>
-          <TextInput
-            onChange={this.onTitleChangeHandler}
-            value={this.state.title}
+        <SectionHeading>Title</SectionHeading>
+        <TextInput
+          onChange={onTitleChangeHandler}
+          value={title}
+        />
+        <SectionHeading>Body</SectionHeading>
+        <Textarea
+          onChange={onBodyChangeHandler}
+          value={body}
+        />
+        <SectionHeading>Has abstract?</SectionHeading>
+        <FieldGroup row={false}>
+          <RadioButtonField
+            labelText="Yes"
+            checked={hasAbstract}
+            value="yes"
+            onChange={onHasAbstractChangeHandler}
+            name="abstractOption"
+            id="yesCheckbox"
           />
-          <SectionHeading>Body</SectionHeading>
+          <RadioButtonField
+            labelText="No"
+            checked={!hasAbstract}
+            value="no"
+            onChange={onHasAbstractChangeHandler}
+            name="abstractOption"
+            id="noCheckbox"
+          />
+        </FieldGroup>
+      </Typography>
+      {hasAbstract && (
+        <Typography>
+          <SectionHeading>Abstract</SectionHeading>
           <Textarea
-            onChange={this.onBodyChangeHandler}
-            value={this.state.body}
+            onChange={onAbstractChangeHandler}
+            value={abstract}
           />
-          <SectionHeading>Has abstract?</SectionHeading>
-          <FieldGroup row={false}>
-            <RadioButtonField
-              labelText="Yes"
-              checked={this.state.hasAbstract}
-              value="yes"
-              onChange={this.onHasAbstractChangeHandler}
-              name="abstractOption"
-              id="yesCheckbox"
-            />
-            <RadioButtonField
-              labelText="No"
-              checked={!this.state.hasAbstract}
-              value="no"
-              onChange={this.onHasAbstractChangeHandler}
-              name="abstractOption"
-              id="noCheckbox"
-            />
-          </FieldGroup>
         </Typography>
-        {this.state.hasAbstract && (
-          <Typography>
-            <SectionHeading>Abstract</SectionHeading>
-            <Textarea
-              onChange={this.onAbstractChangeHandler}
-              value={this.state.abstract}
-            />
-          </Typography>
-        )}
-      </div>
-    );
-  }
+      )}
+    </div>
+  )
 }
 
-export default App;
+export default EntryEditor;
